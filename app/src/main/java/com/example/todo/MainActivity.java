@@ -1,10 +1,14 @@
 package com.example.todo;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,11 +22,14 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView;
     private DBConnect dbConnect;
     private List<TodoModel> todoModelList;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        context = this;
 
         //making references for the elements in the view
         button = findViewById(R.id.button);
@@ -55,6 +62,43 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), AddTodo.class);
                 startActivity(intent);
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                TodoModel todoModel = todoModelList.get(position);
+
+                //create alert boxes
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle(todoModel.getTitle());
+                builder.setMessage(todoModel.getDescription());
+
+                //create buttons
+                builder.setNeutralButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(context, EditTodo.class));
+                    }
+                });
+
+                builder.setPositiveButton("Finished", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(context, MainActivity.class));
+                    }
+                });
+
+                builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dbConnect.deleteTodo(todoModel.getId());
+                        startActivity(new Intent(context, MainActivity.class));
+                    }
+                });
+                builder.show();
             }
         });
     }

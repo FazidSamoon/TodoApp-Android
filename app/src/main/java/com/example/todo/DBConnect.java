@@ -99,4 +99,10 @@ public class DBConnect extends SQLiteOpenHelper {
         }
         return todoModelList;
     }
+
+    public void deleteTodo(int id) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+        sqLiteDatabase.delete(TABLE_NAME, ID + " =?", new String[]{String.valueOf(id)});
+        sqLiteDatabase.close();
+    }
 }
