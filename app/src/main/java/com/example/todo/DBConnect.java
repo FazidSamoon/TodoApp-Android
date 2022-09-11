@@ -2,11 +2,15 @@ package com.example.todo;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DBConnect extends SQLiteOpenHelper {
     private static final int VERSION_NUMBER = 1;
@@ -20,7 +24,6 @@ public class DBConnect extends SQLiteOpenHelper {
 
     public DBConnect(@Nullable Context context) {
         super(context, DB_NAME, null, VERSION_NUMBER);
-        System.out.println("db object created");
     }
 
     @Override
@@ -28,7 +31,6 @@ public class DBConnect extends SQLiteOpenHelper {
         String CREATE_TABLE_QUERY = "CREATE TABLE " + TABLE_NAME + " (" + ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + TABLE_TITLE + " TEXT," + DESCRIPTION + " TEXT," + STARTED + " TEXT," + FINISHED + " TEXT" + ");";
 
         db.execSQL(CREATE_TABLE_QUERY);
-        System.out.println("table created");
     }
 
     @Override
@@ -41,7 +43,6 @@ public class DBConnect extends SQLiteOpenHelper {
     }
 
     public void addTodos(TodoModel todoModel) {
-        System.out.println("hell");
         //use to write data into database
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
 
@@ -56,11 +57,46 @@ public class DBConnect extends SQLiteOpenHelper {
         contentValues.put(FINISHED, todoModel.getFinished());
 
         //save data into table
-        long i = sqLiteDatabase.insert(TABLE_NAME, null, contentValues);
+        sqLiteDatabase.insert(TABLE_NAME, null, contentValues);
 
-        System.out.println(i);
-
-        //close the DB co
+        //close the DB connection
         sqLiteDatabase.close();
+    }
+
+    public int countTodos() {
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME;
+
+        //cursor type object is needed to capture the details return from the query
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+        return cursor.getCount();
+    }
+
+    public List<TodoModel> getAllTodos() {
+        //creating a generic list to store TodoModel type data to save
+        List<TodoModel> todoModelList = new ArrayList<>();
+        //sqlite object to read data
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME;
+
+        Cursor cursor = sqLiteDatabase.rawQuery(query, null);
+
+        if(cursor.moveToFirst()) { //check weather first element of the cursor is empty or not
+            //if not empty (TRUE) loop until end of the object
+            do{
+                //todoModel to store retrieved data
+                TodoModel todoModel = new TodoModel();
+
+                todoModel.setId(cursor.getInt(0));
+                todoModel.setTitle(cursor.getString(1));
+                todoModel.setDescription(cursor.getString(2));
+                todoModel.setStarted(cursor.getLong(3));
+                todoModel.setFinished(cursor.getLong(4));
+
+                //adding the retrieved data into the generic todoModelList
+                todoModelList.add(todoModel);
+            } while(cursor.moveToNext()); //loop while the last element
+        }
+        return todoModelList;
     }
 }

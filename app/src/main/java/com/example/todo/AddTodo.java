@@ -2,6 +2,7 @@ package com.example.todo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -36,6 +37,9 @@ public class AddTodo extends AppCompatActivity {
 
                 //send data to the addTodos methods to store in DB
                 dbConnect.addTodos(todoModel);
+
+                //redirect to the main screen after saving
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
             }
         });
     }
