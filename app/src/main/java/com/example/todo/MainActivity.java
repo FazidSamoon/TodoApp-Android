@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         //make a reference to the TodoAdapter class
         //TodoAdapter class return each and every single row of todos
-        TodoAdapter todoAdapter = new TodoAdapter(getApplicationContext(), R.layout.single_todo, todoModelList);
+        TodoAdapter todoAdapter = new TodoAdapter(this, R.layout.single_todo, todoModelList);
         //setting the adapter to the list view to be displayed
         listView.setAdapter(todoAdapter);
 
@@ -80,13 +80,18 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNeutralButton("Update", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(context, EditTodo.class));
+                        Intent intent = new Intent(context, EditTodo.class);
+                        intent.putExtra("id", todoModel.getId());
+                        startActivity(intent);
                     }
                 });
 
                 builder.setPositiveButton("Finished", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        long time = System.currentTimeMillis();
+                        todoModel.setFinished(time);
+                        dbConnect.updateTodo(todoModel);
                         startActivity(new Intent(context, MainActivity.class));
                     }
                 });

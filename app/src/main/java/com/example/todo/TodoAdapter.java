@@ -43,9 +43,9 @@ public class TodoAdapter extends ArrayAdapter<TodoModel> {
         description.setText(todoModel.getDescription());
         tickIcon.setVisibility(row.INVISIBLE);
 
-//        if(todoModel.getFinished() > 0) {
-//            tickIcon.setVisibility(View.VISIBLE);
-//        }
+        if(todoModel.getFinished() > 0) {
+            tickIcon.setVisibility(View.VISIBLE);
+        }
 
         return row;
     }

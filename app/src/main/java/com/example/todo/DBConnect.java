@@ -105,4 +105,40 @@ public class DBConnect extends SQLiteOpenHelper {
         sqLiteDatabase.delete(TABLE_NAME, ID + " =?", new String[]{String.valueOf(id)});
         sqLiteDatabase.close();
     }
+
+    public TodoModel getToddById(int id) {
+        SQLiteDatabase sqLiteDatabase = getReadableDatabase();
+        Cursor cursor = sqLiteDatabase.query(TABLE_NAME, new String[]{ID,TABLE_TITLE, DESCRIPTION, STARTED, FINISHED}, ID + "= ?", new String[]{String.valueOf(id)}, null, null, null);
+        TodoModel todoModel;
+        if(cursor != null) {
+            cursor.moveToFirst();
+
+            todoModel = new TodoModel();
+
+            todoModel.setId(cursor.getInt(0));
+            todoModel.setTitle(cursor.getString(1));
+            todoModel.setDescription(cursor.getString(2));
+            todoModel.setStarted(cursor.getLong(3));
+            todoModel.setFinished(cursor.getLong(4));
+            return todoModel;
+        }
+        return null;
+    }
+
+    public int updateTodo(TodoModel todoModel) {
+        SQLiteDatabase sqLiteDatabase = getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(TABLE_TITLE, todoModel.getTitle());
+        contentValues.put(DESCRIPTION, todoModel.getDescription());
+        contentValues.put(STARTED, todoModel.getStarted());
+        contentValues.put(FINISHED, todoModel.getFinished());
+
+        //status returns the number of columns affected by the query
+        //number of columns updated
+        int status = sqLiteDatabase.update(TABLE_NAME, contentValues, ID + " =?", new String[]{String.valueOf(todoModel.getId())});
+        sqLiteDatabase.close();
+        return status;
+    }
 }
